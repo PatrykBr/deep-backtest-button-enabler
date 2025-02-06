@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Deep Backtest Button Enabler",
+  "version": "1.0",
+  "description": "Enables the deep backtest button on TradingView even when the settings dialog is open.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://tradingview.com/*",
+        "https://*.tradingview.com/*",
+        "http://tradingview.com/*",
+        "http://*.tradingview.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
