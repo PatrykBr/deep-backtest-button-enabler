@@ -4,7 +4,8 @@
   // Configuration for selectors and delay settings.
   const CONFIG = {
     buttonSelector: "button[data-overflow-tooltip-text*='Generate report']",
-    dialogSelector: "div[data-dialog-name='TradeAlgo Strategy Tester']",
+    // Match any open settings/dialog overlay
+    dialogSelector: "div[data-dialog-name]",
     debounceDelay: 200,
     clickDelay: { min: 40, max: 70 },
     restoreDelay: { min: 300, max: 500 },
@@ -85,6 +86,9 @@
       dialog.style.display = "none";
       if (CONFIG.debug) console.log("Dialog hidden");
 
+      // Re-enable any disabled buttons before clicking
+      enableDeepBacktestButtons();
+
       await sleep(randomDelay(CONFIG.clickDelay.min, CONFIG.clickDelay.max));
       simulatedClick = true;
       button.click();
@@ -99,7 +103,7 @@
   };
 
   /**
-   * Intercepts clicks on the “Generate report” button and bypasses the dialog if necessary.
+   * Intercepts clicks on the "Generate report" button and bypasses the dialog if necessary.
    */
   document.addEventListener(
     "click",
@@ -113,12 +117,14 @@
           return;
         }
 
-        const dialog = document.querySelector(CONFIG.dialogSelector);
-        if (dialog && dialog.style.display !== "none") {
+        const overlay = document.querySelector(CONFIG.dialogSelector);
+        if (overlay && overlay.style.display !== "none") {
+          // Bypass any blocking overlay (settings dialog or backtesting pane)
           event.stopImmediatePropagation();
           event.preventDefault();
-          if (CONFIG.debug) console.log("Intercepted click to bypass the dialog");
-          simulateClickWithDialogBypass(button, dialog);
+          if (CONFIG.debug) console.log("Intercepted click to bypass overlay");
+          simulateClickWithDialogBypass(button, overlay);
+          return;
         }
       } catch (error) {
         console.error("[DeepBacktest] Error in click event handler:", error);
